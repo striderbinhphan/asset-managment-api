@@ -3,7 +3,7 @@ import {Organization} from '@prisma/client';
 import {PaginationQueryDto, PaginatedResponseDto} from '../common/dtos/pagination.dto';
 import {formatPaginatedResponse, calculateTakeAndSkip} from '../common/helper/paginate.helper';
 import {PrismaService} from '../prisma/prisma.service';
-import {GetOrganizationsInputDto} from './dtos/organization-input.dto';
+import {CreateOrganizationInputDto, GetOrganizationsInputDto} from './dtos/organization-input.dto';
 
 @Injectable()
 export class OrganizationService {
@@ -81,5 +81,41 @@ export class OrganizationService {
   async getAll(query: GetOrganizationsInputDto, pagination: PaginationQueryDto) {
     const {conditions, orderBy} = this.transformOrganizationConditions(query);
     return this.genericGetAll(conditions, pagination, orderBy);
+  }
+
+  async create(data: CreateOrganizationInputDto) {
+    return this.prismaService.organization.create({
+      data,
+    });
+  }
+
+  async update(organizationId: number, data: any) {
+    return this.prismaService.organization.update({
+      where: {
+        id: organizationId,
+      },
+      data,
+    });
+  }
+
+  async getById(organizationId: number) {
+    return this.prismaService.organization.findUnique({
+      include: {
+        organizationLocations: {
+          include: {location: true},
+        },
+      },
+      where: {
+        id: organizationId,
+      },
+    });
+  }
+  
+  async delete(organizationId: number) {
+    return this.prismaService.organization.delete({
+      where: {
+        id: organizationId,
+      },
+    });
   }
 }
