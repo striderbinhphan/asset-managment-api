@@ -33,3 +33,4 @@ The example application is simple asset management sevice. It handle sync daily 
 - OrganizationModule: Responsible for managing organizations.
 - ExternalModule: Handles integration with third-party services.
 - SchedulerModule: Handles daily asset cron jobs.
+- prisma folder: Responsible for db entities, migrations and seed function.
