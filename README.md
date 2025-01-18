@@ -15,6 +15,10 @@ npm install
 npm run dev
 ```
 
+- Run DB migration by cmd:
+```bash
+npm run db:migrate
+```
 ## Functionality overview
 
 The example application is simple asset management sevice. It handle sync daily asset status in activated organization location

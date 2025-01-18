@@ -72,7 +72,7 @@ export class SchedulerService {
     }
   }
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   async syncDailyAssets() {
     console.log('Syncing assets');
     // get all organization
