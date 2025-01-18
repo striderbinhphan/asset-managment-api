@@ -26,15 +26,16 @@ export class SchedulerService {
       },
     });
   }
-  async insertAssets(organizationId: number, asserts: GetAssetResponse[]) {
-    return this.prismaService.$transaction(async (trx) => {
-      const chunks = chunk(asserts, 100);
-      for (const chunk of chunks) {
-        const insertedAssets = await trx.asset.findMany({where: {id: {in: chunk.map((a) => +a.id)}}});
+  async processSyncAssetsToDb(organizationId: number, asserts: GetAssetResponse[]) {
+    const chunks = chunk(asserts, 100);
+    // sync assets by chunk
+    for (const chunk of chunks) {
+      const insertedAssets = await this.prismaService.asset.findMany({where: {id: {in: chunk.map((a) => +a.id)}}});
+      console.log(insertedAssets.length);
+      await this.prismaService.$transaction(async (trx) => {
         const newAssets = [];
-        // insert asset by chunk
         for (const asset of chunk) {
-          const insertedAsset = insertedAssets.find((insertedAsset) => insertedAsset.id === asset.id);
+          const insertedAsset = insertedAssets.find((insertedAsset) => insertedAsset.id == asset.id);
           const baseAssetInfo = {
             type: asset.type,
             serial: asset.serial,
@@ -47,7 +48,6 @@ export class SchedulerService {
               where: {id: insertedAsset.id},
               data: {
                 ...baseAssetInfo,
-                id: +asset.id,
                 createdAt: new Date(asset.created_at),
                 updatedAt: new Date(asset.updated_at),
               },
@@ -55,24 +55,27 @@ export class SchedulerService {
           } else {
             newAssets.push({
               ...baseAssetInfo,
+              id: +asset.id,
               organizationId,
               locationId: asset.location_id,
               updatedAt: new Date(asset.updated_at),
             });
           }
-
-          // insert new assets by batch to optimize query
-          if (newAssets.length) {
-            await trx.asset.createMany({data: newAssets});
-          }
         }
-      }
-    });
+
+        // insert new assets by batch to optimize query
+        if (newAssets.length) {
+          console.log(newAssets);
+          await trx.asset.createMany({data: newAssets});
+        }
+      });
+    }
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-  async syncAssets() {
+  @Cron(CronExpression.EVERY_MINUTE)
+  async syncDailyAssets() {
     console.log('Syncing assets');
+    // get all organization
     const organizationLocations = await this.getValidOrganizationLocations();
     for (const organizationLocation of organizationLocations) {
       const syncLocationId = organizationLocation.locationId;
@@ -83,7 +86,7 @@ export class SchedulerService {
       // verify assets
       const validAssets = this.getValidAssetsForSync(syncLocationId, assets);
       if (validAssets.length) {
-        await this.insertAssets(organizationLocation.organizationId, validAssets);
+        await this.processSyncAssetsToDb(organizationLocation.organizationId, validAssets);
       }
     }
     console.log('Synced assets');

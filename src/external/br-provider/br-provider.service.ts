@@ -14,7 +14,6 @@ export class BRProviderService {
           params,
         }),
       );
-      console.log(axiosResponse.data);
       return axiosResponse.data;
     } catch (error) {
       console.error(error?.message);

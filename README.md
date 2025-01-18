@@ -30,7 +30,7 @@ The example application is simple asset management sevice. It handle sync daily 
 - Get list organizations
 
 **Main Modules:**
-- AssetModule: responsible for asset 
-- OrganizationModule: responsible for organization
-- ExternalModule: module integration with 3rd sevices
-- SchedulerModule:  handling asset cron job
+- AssetModule: Responsible for managing assets.
+- OrganizationModule: Responsible for managing organizations.
+- ExternalModule: Handles integration with third-party services.
+- SchedulerModule: Handles daily asset cron jobs.
