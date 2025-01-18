@@ -10,6 +10,7 @@
 - You can run the app against your OS if you think it will be quicker development.
 
 ```bash
+docker compose up -d
 npm install
 npm run dev
 ```
