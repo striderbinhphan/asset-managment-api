@@ -1,0 +1,25 @@
+services:
+  asset-management-api:
+    container_name: asset-management-api
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - 8002:8002
+    build:
+      context: .
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - asset-management-db
+  asset-management-db:
+    image: postgres:15
+    container_name: asset-management-db
+    restart: always
+    ports:
+      - 5472:5432
+    env_file:
+      - .env
+    volumes:
+      - ./db:/var/lib/postgresql/data

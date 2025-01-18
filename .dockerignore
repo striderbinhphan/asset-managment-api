@@ -1,0 +1,12 @@
+Dockerfile
+.dockerignore
+node_modules
+npm-debug.log
+dist
+build
+db
+assets
+.platform
+infrastructure
+scripts
+.env

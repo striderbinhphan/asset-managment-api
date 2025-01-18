@@ -1,0 +1,68 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Location {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(200)
+
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  organizationLocations OrganizationLocation[]
+  Asset                 Asset[]
+}
+
+model Organization {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(500)
+
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  organizationLocations OrganizationLocation[]
+  Asset                 Asset[]
+}
+
+enum OrganizationLocationStatus {
+  activated
+  unactive
+}
+
+model OrganizationLocation {
+  organizationId Int
+  organization   Organization               @relation(fields: [organizationId], references: [id])
+  locationId     Int
+  location       Location                   @relation(fields: [locationId], references: [id])
+  status         OrganizationLocationStatus
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+
+  @@id([organizationId, locationId])
+}
+
+enum AssetStatus {
+  activated
+  unactive
+}
+
+model Asset {
+  id             Int          @id @default(autoincrement())
+  type           String       @db.VarChar(50)
+  serial         String       @db.VarChar(50)
+  description    String       @db.VarChar(50)
+  status         AssetStatus
+  locationId     Int
+  location       Location     @relation(fields: [locationId], references: [id])
+  organizationId Int
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
