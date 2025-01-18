@@ -15,8 +15,6 @@ npm install
 npm run dev
 ```
 
-- The other option would be to run it on docker which gets you an environment that is much closer to what runs in the remote environment. See below.
-
 ## Functionality overview
 
 The example application is simple asset management sevice. It handle sync daily asset status in activated organization location
